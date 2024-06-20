@@ -1,0 +1,98 @@
+﻿Name:Rohit Satpute
+Enrollment no. BT21GCS039
+
+
+class Pathfinder:
+    def __init__(self, terrain_span, stamina_reserve, resupply_station, objective_location):
+        self.terrain_span = terrain_span
+        self.stamina_reserve = stamina_reserve
+        self.resupply_station = resupply_station
+        self.objective_location = objective_location
+        self.tracked_regions = set()
+        self.current_position = (0, 0)
+        self.stamina_level = stamina_reserve
+
+
+    def is_accessible_region(self, x, y):
+        return 0 <= x < self.terrain_span and 0 <= y < self.terrain_span
+
+
+    def investigate_territory(self, x, y):
+        if self.stamina_level > 0 and (x, y) not in self.tracked_regions:
+            self.stamina_level -= 1
+            self.tracked_regions.add((x, y))
+            self.current_position = (x, y)
+            print(f"Charting territory {self.current_position}")
+
+
+            if self.current_position == self.objective_location:
+                print("Objective acquired!")
+                return True
+            return False
+        return False
+
+
+    def execute_movement(self, heading):
+        x, y = self.current_position
+        if heading == 'N' and self.is_accessible_region(x, y - 1):
+            return self.investigate_territory(x, y - 1)
+        elif heading == 'S' and self.is_accessible_region(x, y + 1):
+            return self.investigate_territory(x, y + 1)
+        elif heading == 'E' and self.is_accessible_region(x + 1, y):
+            return self.investigate_territory(x + 1, y)
+        elif heading == 'W' and self.is_accessible_region(x - 1, y):
+            return self.investigate_territory(x - 1, y)
+        return False
+
+
+    def replenish_stamina(self):
+        self.stamina_level = self.stamina_reserve
+        print(f"Recharging at {self.current_position}")
+
+
+    def embark_on_quest(self):
+        if self.investigate_territory(*self.resupply_station):
+            self.replenish_stamina()
+
+
+        journey_log = []
+        while True:
+            if self.current_position == self.objective_location:
+                break
+
+
+            directions = ['N', 'S', 'E', 'W']
+            territory_scouted = False
+
+
+            for direction in directions:
+                if self.execute_movement(direction):
+                    journey_log.append(direction)
+                    territory_scouted = True
+                    break
+
+
+            if not territory_scouted:
+                if not journey_log:
+                    break  # No more moves possible
+                previous_direction = journey_log.pop()
+                self.execute_movement(self.reverse_course(previous_direction))
+
+
+        print(f"Total duration: {len(self.tracked_regions)} territories charted")
+
+
+    def reverse_course(self, direction):
+        opposites = {'N': 'S', 'S': 'N', 'E': 'W', 'W': 'E'}
+        return opposites[direction]
+
+
+# Example usage:
+terrain_span = 5
+stamina_reserve = 24
+resupply_station = (2, 3)
+objective_location = (4, 4)
+
+
+explorer = Pathfinder(terrain_span, stamina_reserve, resupply_station, objective_location)
+explorer.embark_on_quest()
