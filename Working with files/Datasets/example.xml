@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<person gender="male">
+  <name>Rushikesh</name>
+  <country>India</country>
+  <city>Pune</city>
+  <skills>
+    <skill>Python</skill>
+    <skill>Machine Learning</skill>
+  </skills>
+</person>
